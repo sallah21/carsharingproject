@@ -11,37 +11,71 @@ class Cars(models.Model):
     value = models.IntegerField(db_column='Value', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Cars'
 
 
-# Clients Users  Details Orders Insurance  Listofcars  ORders Detail
 class Client(models.Model):
-    idclient = models.OneToOneField('Users',  models.DO_NOTHING, db_column='idClient', primary_key=True)
+    idclient = models.IntegerField(db_column='idClient', primary_key=True)
+    iduser = models.ForeignKey('Users',  models.DO_NOTHING, db_column='idUser')
     name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
     surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
     pesel = models.CharField(db_column='PESEL', max_length=45, blank=True, null=True)  # Field name made lowercase.
     phonenumber = models.CharField(db_column='PhoneNumber', max_length=45, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Client'
+class Salary(models.Model):
+    idsalary = models.OneToOneField('Staff', models.DO_NOTHING,db_column='idStaff', primary_key=True)
+    amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
+    bonus = models.IntegerField(db_column='Bonus', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'Salary'
+
+class Staff(models.Model):
+    idstaff = models.IntegerField( db_column='idStaff',primary_key=True)
+    idsalary = models.OneToOneField(Salary, models.DO_NOTHING, db_column='idSalary')
+    name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    pesel = models.CharField(db_column='PESEL', max_length=11, blank=True, null=True)  # Field name made lowercase.
+    phonenumber = models.CharField(db_column='PhoneNumber', max_length=12, blank=True, null=True)
+    position = models.CharField(db_column='Position', max_length=45, blank=True, null=True)
+    iduser = models.OneToOneField('Users', models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'Staff'
+
+
+class Users(models.Model):
+    iduser = models.OneToOneField(Staff, models.DO_NOTHING, db_column='idUser', primary_key=True)
+    login = models.CharField(db_column='Login', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    password = models.CharField(db_column='Password', max_length=45, blank=True, null=True)  # Field name made lowercase
+    position = models.CharField(db_column='Position', max_length=45, blank=True, null=True)  # Field name made lowercase
+    idclient = models.OneToOneField(Client, models.DO_NOTHING, db_column='idClient', blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'Users'
 
 
 class Orders(models.Model):
-    idorder = models.OneToOneField('Details', models.DO_NOTHING,  db_column='idOrder', primary_key=True)
+    idorder = models.IntegerField(db_column="idOder",primary_key=True)
     dateoforder = models.DateField(db_column='DateOfOrder', blank=True, null=True)  # Field name made lowercase.
     datestart = models.DateField(db_column='DateStart', blank=True, null=True)  # Field name made lowercase.
     dateend = models.DateField(db_column='DateEnd', blank=True, null=True)  # Field name made lowercase.
     idclient = models.ForeignKey(Client, models.DO_NOTHING, db_column='idClient', blank=True, null=True)
-
+    iddeliverydetail = models.ForeignKey('Details', models.DO_NOTHING,  db_column='idOrder')
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Orders'
 
 
 class Details(models.Model):
-    iddetails = models.OneToOneField(Orders, models.DO_NOTHING, db_column='idOrder', primary_key=True)
+    iddetails = models.IntegerField( db_column='idOrder', primary_key=True)
     time = models.TimeField(db_column='Time', blank=True, null=True)  # Field name made lowercase.
     zipcode = models.CharField(db_column='ZipCode', max_length=45, blank=True, null=True)  # Field name made lowercase.
     city = models.CharField(db_column='City', max_length=45, blank=True, null=True)  # Field name made lowercase.
@@ -49,39 +83,29 @@ class Details(models.Model):
     buildingnumber = models.CharField(db_column='BuildingNumber', max_length=45, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Details'
 
-
-class Feedback(models.Model):
-    idorder = models.AutoField(db_column='idOrder', primary_key=True)
-    amountofstar = models.IntegerField(db_column='AmountOfStar', blank=True, null=True)  # Field name made lowercase.
-    description = models.TextField(db_column='Description', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Feedback'
-
-
 class Listofcars(models.Model):
-    idlistofcars = models.OneToOneField('Insurance',  models.DO_NOTHING, db_column='idInsurance', primary_key=True)
+    idlistofcars = models.IntegerField( db_column='idInsurance', primary_key=True)
+  #  idinsurance = models.OneToOneField('Insurance',  models.DO_NOTHING, db_column='idInsurance')
     idcar = models.ForeignKey(Cars, models.DO_NOTHING, db_column='idCar', blank=True, null=True)
     idorder = models.ForeignKey('Orders', models.DO_NOTHING, db_column='idOrder', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ListOfCars'
 
 
 class Insurance(models.Model):
-    idinsurance = models.OneToOneField(Listofcars, models.DO_NOTHING,  db_column='idInsurance', primary_key=True)
+    idinsurance = models.IntegerField(db_column='idInsurance', primary_key=True)
     startdate = models.DateField(db_column='StartDate', blank=True, null=True)  # Field name made lowercase.
     enddate = models.DateField(db_column='EndDate', blank=True, null=True)  # Field name made lowercase.
     cost = models.IntegerField(db_column='Cost', blank=True, null=True)  # Field name made lowercase.
     amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Insurance'
 
 
@@ -93,7 +117,7 @@ class Listofservices(models.Model):
     amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ListOfServices'
 
 
@@ -103,7 +127,7 @@ class Listofstaff(models.Model):
     idservice = models.ForeignKey('Service', models.DO_NOTHING, db_column='idService', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ListOfStaff'
 
 
@@ -116,32 +140,9 @@ class Payment(models.Model):
     idorder = models.ForeignKey(Orders, models.DO_NOTHING, db_column='idOrder', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Payment'
 
-
-class Salary(models.Model):
-    idsalary = models.OneToOneField('Staff', models.DO_NOTHING,db_column='idStaff', primary_key=True)
-    amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
-    bonus = models.IntegerField(db_column='Bonus', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Salary'
-
-
-class Staff(models.Model):
-    idstaff = models.OneToOneField(Salary, models.DO_NOTHING, db_column='idStaff', primary_key=True)
-    name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    pesel = models.CharField(db_column='PESEL', max_length=11, blank=True, null=True)  # Field name made lowercase.
-    phonenumber = models.CharField(db_column='PhoneNumber', max_length=12, blank=True, null=True)
-    position = models.CharField(db_column='Position', max_length=45, blank=True, null=True)
-    iduser = models.OneToOneField('Users', models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Staff'
 
 
 class Service(models.Model):
@@ -152,7 +153,7 @@ class Service(models.Model):
     idcar = models.ForeignKey(Cars, models.DO_NOTHING, db_column='idCar', blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Service'
 
 
@@ -163,17 +164,17 @@ class Servicetype(models.Model):
     description = models.TextField(db_column='Description', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'ServiceType'
 
 
-class Users(models.Model):
-    iduser = models.OneToOneField(Staff, models.DO_NOTHING, db_column='idUser', primary_key=True)
-    login = models.CharField(db_column='Login', max_length=45, blank=True, null=True)  # Field name made lowercase.
-    password = models.CharField(db_column='Password', max_length=45, blank=True, null=True)  # Field name made lowercase
-    position = models.CharField(db_column='Position', max_length=45, blank=True, null=True)  # Field name made lowercase
-    idclient = models.OneToOneField(Client, models.DO_NOTHING, db_column='idClient', blank=True, null=True)
+
+
+class Feedback(models.Model):
+    idorder = models.AutoField(db_column='idOrder', primary_key=True)
+    amountofstar = models.IntegerField(db_column='AmountOfStar', blank=True, null=True)  # Field name made lowercase.
+    description = models.TextField(db_column='Description', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
-        db_table = 'Users'
+        managed = True
+        db_table = 'Feedback'
