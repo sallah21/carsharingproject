@@ -1,4 +1,8 @@
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.template import RequestContext
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import *
 from .forms import *
 
@@ -16,14 +20,24 @@ def cars_view(request):
 
 def users_view(request):
     context = {}
-    context["dataset"] = Users.objects.all()
+    print("Laduje")
+    context["dataset"] = Staff.objects.all()
+    print(Staff.objects.all())
+    print("zaladowane")
+
+
     return render(request, "users_view.html", context)
 
 
 def user_create_view(request):
     context = {}
+    print("działa 1")
+    print("działa 2")
     form = UserForm(request.POST or None)
+    print("działa 3")
     if form.is_valid():
         form.save()
+
     context["form"] = form
-    return render(request, "createUser_view.html",context)
+    print("działa 4")
+    return render(request, "createUser_view.html", context)

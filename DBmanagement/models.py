@@ -27,7 +27,7 @@ class Client(models.Model):
         managed = True
         db_table = 'Client'
 class Salary(models.Model):
-    idsalary = models.OneToOneField('Staff', models.DO_NOTHING,db_column='idStaff', primary_key=True)
+    idstaff = models.OneToOneField('Staff', models.DO_NOTHING, db_column='idStaff', primary_key=True)
     amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
     bonus = models.IntegerField(db_column='Bonus', blank=True, null=True)  # Field name made lowercase.
 
@@ -36,8 +36,9 @@ class Salary(models.Model):
         db_table = 'Salary'
 
 class Staff(models.Model):
-    idstaff = models.IntegerField( db_column='idStaff',primary_key=True)
-    idsalary = models.OneToOneField(Salary, models.DO_NOTHING, db_column='idSalary')
+
+
+    idstaff = models.OneToOneField(Salary, models.DO_NOTHING, db_column='idStaff', primary_key=True)
     name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
     surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
     pesel = models.CharField(db_column='PESEL', max_length=11, blank=True, null=True)  # Field name made lowercase.

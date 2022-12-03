@@ -10,7 +10,10 @@ class BaseFrom(forms.ModelForm):
 
 class UserForm(forms.ModelForm):
     class Meta:
-        model = Users
+        model = Staff
         fields = '__all__'
 
-
+class NewUserForm(forms.ModelForm):
+    class Meta:
+        model = Users
+        fields = '__all__'
