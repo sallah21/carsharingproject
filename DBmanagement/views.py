@@ -54,9 +54,14 @@ def car_delete_view(request,id):
     context = {}
     obj = get_object_or_404(Cars, idcar=id)
     if request.method == "POST":
-        # delete object
         obj.delete()
-        # after deleting redirect to
-        # home page
         return HttpResponseRedirect("/")
     return render(request, "deletecar_view.html", context)
+
+def service_delete_view(request,id):
+    context = {}
+    obj = get_object_or_404(Service, idservice=id)
+    if request.method == "POST":
+        obj.delete()
+        return HttpResponseRedirect("/")
+    return render(request, "deleteservice_view.html", context)
