@@ -36,8 +36,6 @@ class Salary(models.Model):
         db_table = 'Salary'
 
 class Staff(models.Model):
-
-
     idstaff = models.OneToOneField(Salary, models.DO_NOTHING, db_column='idStaff', primary_key=True)
     name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
     surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.

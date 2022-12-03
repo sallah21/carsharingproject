@@ -4,6 +4,8 @@ from DBmanagement import views
 urlpatterns = [
 
     path('cars/', views.cars_view),
-    path('users/', views.users_view),
-    path('createuser/', views.user_create_view)
+    path('createcar/', views.car_create_view),
+    path('cars/<id>/delete', views.car_delete_view),
+    path('services/', views.services_view),
+    path('createservice/', views.service_create_view)
 ]

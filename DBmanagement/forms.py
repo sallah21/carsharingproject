@@ -8,12 +8,18 @@ class BaseFrom(forms.ModelForm):
         fields = '__all__'
 
 
-class UserForm(forms.ModelForm):
+class ServiceFrom(forms.ModelForm):
     class Meta:
-        model = Staff
+        model = Service
         fields = '__all__'
 
 class NewUserForm(forms.ModelForm):
     class Meta:
         model = Users
+        fields = '__all__'
+
+
+class CarFrom(forms.ModelForm):
+    class Meta:
+        model = Cars
         fields = '__all__'

@@ -1,20 +1,28 @@
 {% block page_content %}
         <div class="mw6 center pa3 sans-serif">
 
-        {% for v in dataset %}
+  {% for v in services %}
 
             <div class="pa2 mb3 striped--near-white">
 
                 <div class="pl2">
 
-                    <p class="mb2">Login/Password: {{ v.name }} {{ v.surname }}</p>
 
+                <div class="pl2">
+                        <p class="mb2">Price: {{ v.price }} </p>
+                        <p class="mb2">Date of start: {{ v.dateofstart }} </p>
+                         <p class="mb2">Date of end: {{ v.dateofend }} </p>
+
+                </div>
 
                 </div>
 
             </div>
 
         {% endfor %}
+
+
+
 
         </div>
 

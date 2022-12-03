@@ -1,9 +1,8 @@
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import *
+
 from .forms import *
 
 
@@ -18,22 +17,20 @@ def cars_view(request):
     return render(request, "cars_view.html", context)
 
 
-def users_view(request):
+def services_view(request):
     context = {}
     print("Laduje")
-    context["dataset"] = Staff.objects.all()
-    print(Staff.objects.all())
+    context["services"] = Service.objects.all()
+    print(context["services"][0].price)
     print("zaladowane")
-
-
     return render(request, "users_view.html", context)
 
 
-def user_create_view(request):
+def service_create_view(request):
     context = {}
     print("działa 1")
     print("działa 2")
-    form = UserForm(request.POST or None)
+    form = ServiceFrom(request.POST or None)
     print("działa 3")
     if form.is_valid():
         form.save()
@@ -41,3 +38,25 @@ def user_create_view(request):
     context["form"] = form
     print("działa 4")
     return render(request, "createUser_view.html", context)
+
+def car_create_view(request):
+    context = {}
+    form = CarFrom(request.POST or None)
+    print("działa 3")
+    if form.is_valid():
+        form.save()
+
+    context["form"] = form
+    print("działa 4")
+    return render(request, "createcar_view.html", context)
+
+def car_delete_view(request,id):
+    context = {}
+    obj = get_object_or_404(Cars, idcar=id)
+    if request.method == "POST":
+        # delete object
+        obj.delete()
+        # after deleting redirect to
+        # home page
+        return HttpResponseRedirect("/")
+    return render(request, "deletecar_view.html", context)
