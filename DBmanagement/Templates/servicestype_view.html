@@ -1,0 +1,27 @@
+
+
+{% block page_content %}
+
+        <div class="mw6 center pa3 sans-serif">
+
+
+
+        {% for v in typesofservices %}
+
+            <div class="pa2 mb3 striped--near-white">
+
+                <div class="pl2">
+                    <p class="mb2">ID: {{ v.idservicetype }}</p>
+                    <p class="mb2">Name: {{ v.name }}</p>
+                    <p class="mb2">Descrition {{ v.description }}</p>
+                    <p class="mb2">Cost {{ v.cost }}</p>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+{% endblock %}

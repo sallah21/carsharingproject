@@ -13,6 +13,7 @@ class ServiceFrom(forms.ModelForm):
         model = Service
         fields = '__all__'
 
+
 class NewUserForm(forms.ModelForm):
     class Meta:
         model = Client
@@ -25,3 +26,10 @@ class NewCarFrom(forms.ModelForm):
         fields = '__all__'
 
 
+class NewOrderForm(forms.ModelForm):
+    DateOfOrder = forms.DateInput()
+    DateStart = forms.DateInput()
+    DateEnd = forms.DateInput()
+    class Meta:
+        model = Order
+        fields = '__all__'

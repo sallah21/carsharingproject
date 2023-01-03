@@ -1,0 +1,32 @@
+
+
+{% block page_content %}
+
+        <div class="mw6 center pa3 sans-serif">
+
+
+
+        {% for v in dataset %}
+
+            <div class="pa2 mb3 striped--near-white">
+
+                <div class="pl2">
+                    <p class="mb2">ID: {{ v.idorder }}</p>
+                    <p class="mb2">Date of order: {{ v.dateoforder }}</p>
+                    <p class="mb2">Date start: {{ v.datestart }}</p>
+                    <p class="mb2">Date end: {{ v.dateend }}</p>
+                    <p class="mb2">ZipCode: {{ v.zipcode }}</p>
+                    <p class="mb2">City : {{ v.city }}</p>
+                    <p class="mb2">Street: {{ v.street }}</p>
+                    <p class="mb2">Bulding number: {{ v.buldingnumber }}</p>
+                    <p class="mb2">Feedback: {{ v.feedback }}</p>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+{% endblock %}

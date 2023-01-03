@@ -10,4 +10,9 @@ urlpatterns = [
     path('services/<id>/delete', views.service_delete_view),
     path('createservice/', views.service_create_view),
     path('users/', views.users_view),
+    path('neworder/', views.new_order_view),
+    path('orders/', views.order_view),
+    path('orders/<id>/delete', views.order_delete_view),
+    path('servicestypes/', views.service_list_view),
+
 ]
