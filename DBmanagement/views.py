@@ -7,12 +7,20 @@ from .forms import *
 
 
 # Create your views here.
+def users_view(request):
+    context = {}
+    print("Laduje")
+    context ["dataset"] = Client.objects.all()
+    print(Client.objects.all())
+    print("zaladowane")
+    return render(request, "users_view.html", context)
+
 
 def cars_view(request):
     context = {}
     print("Laduje")
-    context["dataset"] = Cars.objects.all()
-    print(Cars.objects.all())
+    context["dataset"] = Car.objects.all()
+    print(Car.objects.all())
     print("zaladowane")
     return render(request, "cars_view.html", context)
 
@@ -39,9 +47,18 @@ def service_create_view(request):
     print("działa 4")
     return render(request, "createUser_view.html", context)
 
+def service_delete_view(request,id):
+    context = {}
+    obj = get_object_or_404(Service, idservice=id)
+    if request.method == "POST":
+        obj.delete()
+        return HttpResponseRedirect("/")
+    return render(request, "deleteservice_view.html", context)
+
+
 def car_create_view(request):
     context = {}
-    form = CarFrom(request.POST or None)
+    form = NewCarFrom(request.POST or None)
     print("działa 3")
     if form.is_valid():
         form.save()
@@ -52,16 +69,9 @@ def car_create_view(request):
 
 def car_delete_view(request,id):
     context = {}
-    obj = get_object_or_404(Cars, idcar=id)
+    obj = get_object_or_404(Car, idcar=id)
     if request.method == "POST":
         obj.delete()
         return HttpResponseRedirect("/")
     return render(request, "deletecar_view.html", context)
 
-def service_delete_view(request,id):
-    context = {}
-    obj = get_object_or_404(Service, idservice=id)
-    if request.method == "POST":
-        obj.delete()
-        return HttpResponseRedirect("/")
-    return render(request, "deleteservice_view.html", context)

@@ -76,7 +76,7 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
           'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Carsharing',
+        'NAME': 'CarSharing',
         'USER': 'postgres',
         'PASSWORD': 'Sk123456',
         'HOST': '127.0.0.1',

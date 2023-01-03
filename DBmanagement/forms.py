@@ -4,7 +4,7 @@ from .models import *
 
 class BaseFrom(forms.ModelForm):
     class Meta:
-        model = Cars
+        model = Car
         fields = '__all__'
 
 
@@ -15,11 +15,13 @@ class ServiceFrom(forms.ModelForm):
 
 class NewUserForm(forms.ModelForm):
     class Meta:
-        model = Users
+        model = Client
         fields = '__all__'
 
 
-class CarFrom(forms.ModelForm):
+class NewCarFrom(forms.ModelForm):
     class Meta:
-        model = Cars
+        model = Car
         fields = '__all__'
+
+
