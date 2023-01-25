@@ -1,13 +1,10 @@
 import jwt
 from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.utils import json
+from rest_framework.permissions import AllowAny
 
 from .forms import *
 
@@ -47,11 +44,8 @@ def users_view(request):
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
-
-            context = {}
             queryset = Client.objects.all()
             data = serializers.serialize('json', queryset)
-            context["dataset"] = queryset
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({"error": "authentication error" })
@@ -179,6 +173,7 @@ def new_order_view(request):
     context["form"] = form
     return render(request, "createorder_view.html", context)
 
+
 @api_view(["POST"])
 def order_delete_view(request):
     context = {}
@@ -187,6 +182,8 @@ def order_delete_view(request):
         obj.delete()
         return HttpResponseRedirect("/")
     return render(request, "deleteorder_view.html", context)
+
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def orders_count(request):
@@ -194,10 +191,9 @@ def orders_count(request):
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
-            queryset = Order.object.all().count()
+            queryset = Order.objects.all().count()
             print(queryset)
-            data = serializers.serialize('json', queryset)
-            return JsonResponse(data, safe=False)
+            return JsonResponse({"number_of_orders": queryset}, safe=False)
         else:
             return JsonResponse({"error": "authentication error" })
     except KeyError:
@@ -216,3 +212,39 @@ def staff_view(request):
             return JsonResponse({"error": "authentication error" })
     except KeyError:
         return JsonResponse({'error': "database error"} )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def dashborad_view(request):
+    id = jwt.decode(request.data['token'], "adrian")
+    userid = 1
+    print(id)
+    try:
+        if Staff.objects.get(idstaff= id['idStaff']):
+            print("start")
+            user = Client.objects.filter(idclient=userid).values().first()
+            print("user ", user)
+            payment = 0
+            try:
+                for o in Order.objects.filter(idclient=userid):
+                    print("orders ",o.idclient.idclient)
+                    p = Payment.objects.filter(idorder=o.idorder).first()
+                    print("p", p)
+                    payment = payment + p.amounttopay - p.amountpayed
+                raw_q = "Select * IN Payment JOIN Order on Payment.idOrder = Order.idOrder JOIN Client ON" \
+                        " Order.idClient = Client.idClient"
+                print("payment", payment)
+            except KeyError:
+                print("error", KeyError)
+                return JsonResponse({"error": "server error"})
+            return JsonResponse({
+                'name': user['name'],
+                'surname': user['surname'],
+                'phonenumber': user['phonenumber'],
+                'topay': payment
+            })
+        else:
+            return JsonResponse({"error": "authientication error"})
+    except KeyError:
+        return JsonResponse({'error': KeyError, })
