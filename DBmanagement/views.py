@@ -34,7 +34,7 @@ def login_view(request):
             print("payloaded")
             token = jwt.encode(payload,"adrian")
             print("encoded")
-            return JsonResponse({'token': token.decode('utf-8')})
+            return JsonResponse({'token': token.decode('utf-8')}, status.HTTP_200_OK)
         else:
             return JsonResponse({'error': "did not found match"}, status.HTTP_401_UNAUTHORIZED)
     except KeyError:
