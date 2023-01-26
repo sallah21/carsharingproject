@@ -165,6 +165,7 @@ def car_update_view(request):
         return JsonResponse({'error': KeyError})
 
 
+
 @api_view(["POST"])
 def car_delete_view(request, id):
     context = {}
