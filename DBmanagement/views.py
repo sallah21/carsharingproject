@@ -5,8 +5,10 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-
+from rest_framework.response import Response
 from .forms import *
+from DBmanagement.serializers import client_serializer, car_serializer
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -14,22 +16,13 @@ def login_view(request):
     try:
         username = request.data['username']
         password = request.data['password']
-        print('ps ' + username + " " + password)
-        print("searching in db")
-
         user = Staff.objects.filter(login=username, password=password).values().first() #get_object_or_404(Staff, login=username, password=password)()
 
-        print(user)
-        print("Found")
-
         if user:
-            print("payloading")
             payload = {
                 'idStaff': user['idstaff'],
             }
-            print("payloaded")
             token = jwt.encode(payload,"adrian")
-            print("encoded")
             return JsonResponse({'token': token.decode('utf-8')})
         else:
             return JsonResponse({'error': "did not found match"}, status.HTTP_401_UNAUTHORIZED)
@@ -52,6 +45,7 @@ def users_view(request):
     except KeyError:
         return JsonResponse({'error': "database error"} )
 
+
 @api_view(["POST"])
 def users_create_view(request):
     context = {}
@@ -60,6 +54,8 @@ def users_create_view(request):
         form.save()
     context = form
     return render(request, "createUser_view.html", context)
+
+
 @api_view(["POST"])
 def user_delete_view(request, id):
     context = {}
@@ -69,6 +65,21 @@ def user_delete_view(request, id):
         return HttpResponseRedirect("/")
     return render(request, "deleteservice_view.html", context)
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def client_update_view(request):
+    id = jwt.decode(request.data['token'], "adrian")
+
+    userid = request.data['idClient']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Client.objects.get(idclient = userid)
+            print('Q: ', queryset)
+            cs = client_serializer()
+            data = client_serializer.update(self=cs,instance=queryset, validated_data=request.data)
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -98,13 +109,11 @@ def service_create_view(request):
 
 @api_view(["GET"])
 def service_list_view(request):
-    context = {}
     queryset = Servicetype.objects.all()
-    context["typesofservices"] = queryset
     data = serializers.serialize('json', queryset)
-    context["dataset"] = queryset
     return JsonResponse(data, safe=False)
     return JsonResponse(context)
+
 
 @api_view(["POST"])
 def service_delete_view(request, id):
@@ -129,6 +138,7 @@ def cars_view(request):
     except KeyError:
         return JsonResponse({'error': "database error"})
 
+
 @api_view(["POST"])
 def car_create_view(request):
     context = {}
@@ -137,6 +147,22 @@ def car_create_view(request):
         form.save()
     context["form"] = form
     return render(request, "createcar_view.html", context)
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def car_update_view(request):
+    id = jwt.decode(request.data['token'], "adrian")
+
+    carid = request.data['idCar']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Car.objects.get(idCar=carid)
+            print('Q: ', queryset)
+            cs = car_serializer()
+            data = car_serializer.update(self=cs, instance=queryset, validated_data=request.data)
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 
 @api_view(["POST"])
@@ -199,6 +225,7 @@ def orders_count(request):
     except KeyError:
         return JsonResponse({'error': "database error"})
 
+
 @api_view(["GET"])
 def staff_view(request):
     id = jwt.decode(request.data['token'], "adrian")
@@ -222,22 +249,17 @@ def dashborad_view(request):
     print(id)
     try:
         if Staff.objects.get(idstaff= id['idStaff']):
-            print("start")
             user = Client.objects.filter(idclient=userid).values().first()
-            print("user ", user)
             payment = 0
             try:
                 for o in Order.objects.filter(idclient=userid):
-                    print("orders ",o.idclient.idclient)
                     p = Payment.objects.filter(idorder=o.idorder).first()
-                    print("p", p)
                     payment = payment + p.amounttopay - p.amountpayed
-                raw_q = "Select * IN Payment JOIN Order on Payment.idOrder = Order.idOrder JOIN Client ON" \
-                        " Order.idClient = Client.idClient"
-                print("payment", payment)
+
             except KeyError:
                 print("error", KeyError)
                 return JsonResponse({"error": "server error"})
+
             return JsonResponse({
                 'name': user['name'],
                 'surname': user['surname'],
