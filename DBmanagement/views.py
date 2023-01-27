@@ -216,15 +216,41 @@ def return_car(request):
     except KeyError:
             return JsonResponse({'error': KeyError})
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 def car_delete_view(request, id):
-    context = {}
-    obj = get_object_or_404(Car, idcar=id)
-    if request.method == "POST":
-        obj.delete()
-        return HttpResponseRedirect("/")
-    return render(request, "deletecar_view.html", context)
+    id = jwt.decode(request.data['token'], "adrian")
 
+    idcar = request.data['idCar']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Car.objects.get(idcar=idcar)
+            print('Q: ', queryset)
+            print("updating")
+            queryset.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    except KeyError:
+        return JsonResponse({'error': KeyError})
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def send_feedback(request):
+    id = jwt.decode(request.data['token'], "adrian")
+    feedback = request.data['Feedback']
+    idorder = request.data['idOrder']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Order.objects.get(idorder=idorder)
+            print('Q: ', queryset)
+            os = order_serializer()
+            print("updating")
+            order_serializer.update(os, instance=queryset, validated_data={'Feedback': feedback})
+            return Response(status=status.HTTP_201_CREATED)
+
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_customer_orders(request):

@@ -6,6 +6,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import exceptions, serializers
 from DBmanagement.models import Client, Car, Order
 
+
 class order_serializer(ModelSerializer):
     def create(self, validated_data):
         instance = Order()
@@ -31,6 +32,23 @@ class order_serializer(ModelSerializer):
         instance.idclient = Client.objects.get(idclient=validated_data.get('idClient', instance.feedback))
         instance.save()
         return instance
+
+    def update(self, instance, validated_data):
+        instance.dateoforder = validated_data.get('DateOfOrder', instance.dateoforder)
+        instance.datestart = validated_data.get('DateStart', instance.datestart)
+        instance.dateend = validated_data.get('DateEnd', instance.dateend)
+        instance.zipcode = validated_data.get('ZipCode', instance.zipcode)
+        instance.city = validated_data.get('City', instance.city)
+        instance.street = validated_data.get('Street', instance.street)
+        instance.buldingnumber = validated_data.get('BuildingNumber', instance.buldingnumber)
+        instance.feedback = validated_data.get('Feedback', instance.feedback)
+        instance.idclient = validated_data.get('idClient', instance.idclient)
+        instance.save()
+        return instance
+    class Meta:
+        model = Order
+        fields = "__all__"
+
 
 class client_serializer(ModelSerializer):
     def update(self, instance, validated_data):

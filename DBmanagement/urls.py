@@ -5,7 +5,7 @@ urlpatterns = [
 
     path('cars/', views.cars_view),
     path('createcar/', views.car_create_view),
-    path('cars/<id>/delete', views.car_delete_view),
+    path('deletecar/', views.car_delete_view),
     path('services/', views.services_view),
     path('services/<id>/delete', views.service_delete_view),
     path('createservice/', views.service_create_view),
@@ -21,5 +21,7 @@ urlpatterns = [
     path('clientupdate/', views.client_update_view),
     path('customerorders/', views.get_customer_orders),
     path('rentcar/', views.rent_car),
-    path('returncar/', views.return_car)
+    path('returncar/', views.return_car),
+    path('sendfeedback/', views.send_feedback),
+
 ]
