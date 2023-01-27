@@ -1,10 +1,36 @@
-import math
+import datetime
+import random
 
+import shortuuid
 from rest_framework.serializers import ModelSerializer
 from rest_framework import exceptions, serializers
 from DBmanagement.models import Client, Car, Order
 
+class order_serializer(ModelSerializer):
+    def create(self, validated_data):
+        instance = Order()
+        instance.idorder= random.randint(1000, 9999)
+        print("UUID: ", instance.idorder )
+        instance.dateoforder = datetime.date.today()
+        if validated_data.get('DateStart') <= str(datetime.date.today()):
+            print("Start:", validated_data.get('DateStart'))
+            print("Today : ", str(datetime.date.today()))
+            raise Exception("Date of start before date of order")
+        instance.datestart = validated_data.get('DateStart', instance.datestart)
 
+        if validated_data.get('DateStart') > validated_data.get('DateEnd'):
+            print("Start:", validated_data.get('DateStart'))
+            print("End: ", validated_data.get('DateEnd'))
+            raise Exception("Date of start after date of end")
+        instance.dateend = validated_data.get('DateEnd', instance.dateend)
+        instance.zipcode = validated_data.get('ZipCode', instance.zipcode)
+        instance.city = validated_data.get('City', instance.city)
+        instance.street = validated_data.get('Street', instance.street)
+        instance.buldingnumber = validated_data.get('BuildingNumber', instance.buldingnumber)
+        instance.feedback = validated_data.get('Feedback', instance.feedback)
+        instance.idclient = Client.objects.get(idclient=validated_data.get('idClient', instance.feedback))
+        instance.save()
+        return instance
 
 class client_serializer(ModelSerializer):
     def update(self, instance, validated_data):

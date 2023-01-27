@@ -1,6 +1,6 @@
 from django.db import models
 class Car(models.Model):
-    idcar = models.IntegerField(db_column='idCar', primary_key=True)  # Field name made lowercase.
+    idcar = models.AutoField(db_column='idCar', primary_key=True)  # Field name made lowercase.
     model = models.CharField(db_column='Model', max_length=45, blank=True, null=True)  # Field name made lowercase.
     enginetype = models.CharField(db_column='EngineType', max_length=45, blank=True, null=True)  # Field name made lowercase.
     enginecapacity = models.CharField(db_column='EngineCapacity', max_length=45, blank=True, null=True)  # Field name made lowercase.
@@ -14,7 +14,7 @@ class Car(models.Model):
 
 
 class Client(models.Model):
-    idclient = models.IntegerField(db_column='idClient', primary_key=True)  # Field name made lowercase.
+    idclient = models.AutoField(db_column='idClient', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
     surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
     phonenumber = models.CharField(db_column='PhoneNumber', max_length=12, blank=True, null=True)  # Field name made lowercase.
@@ -28,7 +28,7 @@ class Client(models.Model):
 
 
 class Insurance(models.Model):
-    idinsurance = models.IntegerField(db_column='idInsurance')  # Field name made lowercase.
+    idinsurance = models.AutoField(db_column='idInsurance',primary_key=True)  # Field name made lowercase.
     startdate = models.DateField(db_column='StartDate', blank=True, null=True)  # Field name made lowercase.
     enddate = models.DateField(db_column='EndDate', blank=True, null=True)  # Field name made lowercase.
     type = models.CharField(db_column='Type',max_length=45, blank=True, null=True)  # Field name made lowercase.
@@ -41,7 +41,7 @@ class Insurance(models.Model):
 
 
 class Listofcars(models.Model):
-    idlistofcars = models.IntegerField(db_column='idListOfCars', primary_key=True)  # Field name made lowercase.
+    idlistofcars = models.AutoField(db_column='idListOfCars', primary_key=True)  # Field name made lowercase.
     idorder = models.ForeignKey('Order', models.DO_NOTHING, db_column='idOrder', blank=True, null=True)  # Field name made lowercase.
     idcar = models.ForeignKey(Car, models.DO_NOTHING, db_column='idCar', blank=True, null=True)  # Field name made lowercase.
 
@@ -51,7 +51,7 @@ class Listofcars(models.Model):
 
 
 class Listofservice(models.Model):
-    idlistservices = models.IntegerField(db_column='idListServices', primary_key=True)  # Field name made lowercase.
+    idlistservices = models.AutoField(db_column='idListServices', primary_key=True)  # Field name made lowercase.
     amount = models.IntegerField(db_column='Amount', blank=True, null=True)  # Field name made lowercase.
     idservice = models.ForeignKey('Service', models.DO_NOTHING, db_column='idService', blank=True, null=True)  # Field name made lowercase.
     idservicetype = models.ForeignKey('Servicetype', models.DO_NOTHING, db_column='idServiceType', blank=True, null=True)  # Field name made lowercase.
@@ -62,7 +62,7 @@ class Listofservice(models.Model):
 
 
 class Listofstaff(models.Model):
-    idliststaff = models.IntegerField(db_column='idListStaff', primary_key=True)  # Field name made lowercase.
+    idliststaff = models.AutoField(db_column='idListStaff', primary_key=True)  # Field name made lowercase.
     idstaff = models.ForeignKey('Staff', models.DO_NOTHING, db_column='idStaff', blank=True, null=True)  # Field name made lowercase.
     idservice = models.ForeignKey('Service', models.DO_NOTHING, db_column='idService', blank=True, null=True)  # Field name made lowercase.
 
@@ -72,7 +72,7 @@ class Listofstaff(models.Model):
 
 
 class Order(models.Model):
-    idorder = models.IntegerField(db_column='idOrder', primary_key=True)  # Field name made lowercase.
+    idorder = models.AutoField(db_column='idOrder', primary_key=True)  # Field name made lowercase.
     dateoforder = models.DateField(db_column='DateOfOrder', blank=True, null=True)  # Field name made lowercase.
     datestart = models.DateField(db_column='DateStart', blank=True, null=True)  # Field name made lowercase.
     dateend = models.DateField(db_column='DateEnd', blank=True, null=True)  # Field name made lowercase.
@@ -89,7 +89,7 @@ class Order(models.Model):
 
 
 class Payment(models.Model):
-    idpayment = models.IntegerField(db_column='idPayment', primary_key=True)  # Field name made lowercase.
+    idpayment = models.AutoField(db_column='idPayment', primary_key=True)  # Field name made lowercase.
     amounttopay = models.IntegerField(db_column='AmountToPay', blank=True, null=True)  # Field name made lowercase.
     amountpayed = models.IntegerField(db_column='AmountPayed', blank=True, null=True)  # Field name made lowercase.
     dateofpayment = models.DateField(db_column='DateOfPayment', blank=True, null=True)  # Field name made lowercase.
@@ -101,7 +101,7 @@ class Payment(models.Model):
 
 
 class Service(models.Model):
-    idservice = models.IntegerField(db_column='idService', primary_key=True)  # Field name made lowercase.
+    idservice = models.AutoField(db_column='idService', primary_key=True)  # Field name made lowercase.
     dateservicestart = models.DateField(db_column='DateServiceStart', blank=True, null=True)  # Field name made lowercase.
     dateserviceend = models.DateField(db_column='DateServiceEnd', blank=True, null=True)  # Field name made lowercase.
     price = models.IntegerField(db_column='Price', blank=True, null=True)  # Field name made lowercase.
@@ -113,7 +113,7 @@ class Service(models.Model):
 
 
 class Servicetype(models.Model):
-    idservicetype = models.IntegerField(db_column='idServiceType', primary_key=True)  # Field name made lowercase.
+    idservicetype = models.AutoField(db_column='idServiceType', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name',max_length=45 ,blank=True, null=True)  # Field name made lowercase.
     description = models.TextField(db_column='Description', blank=True, null=True)  # Field name made lowercase.
     cost = models.IntegerField(db_column='Cost', blank=True, null=True)  # Field name made lowercase.
@@ -124,7 +124,7 @@ class Servicetype(models.Model):
 
 
 class Staff(models.Model):
-    idstaff = models.IntegerField(db_column='idStaff', primary_key=True)  # Field name made lowercase.
+    idstaff = models.AutoField(db_column='idStaff', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name', max_length=45, blank=True, null=True)  # Field name made lowercase.
     surname = models.CharField(db_column='Surname', max_length=45, blank=True, null=True)  # Field name made lowercase.
     pesel = models.CharField(db_column='PESEL', max_length=11, blank=True, null=True)  # Field name made lowercase.

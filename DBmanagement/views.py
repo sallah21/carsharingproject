@@ -1,3 +1,5 @@
+import datetime
+
 import jwt
 from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
@@ -7,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .forms import *
-from DBmanagement.serializers import client_serializer, car_serializer
+from DBmanagement.serializers import client_serializer, car_serializer, order_serializer
 
 
 @api_view(["POST"])
@@ -80,9 +82,7 @@ def client_update_view(request):
             queryset = Client.objects.get(idclient = userid)
             print('Q: ', queryset)
             cs = client_serializer()
-            print('error ?')
             data = client_serializer.update(self=cs,instance=queryset, validated_data=request.data)
-            print('error ??')
             return Response(status=status.HTTP_200_OK)
     except KeyError:
         return JsonResponse({'error': KeyError})
@@ -179,13 +179,42 @@ def rent_car(request):
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
-            queryset = Car.objects.get(idCar=carid)
+            queryset = Car.objects.get(idcar=carid)
             print('Q: ', queryset)
-            
+
+            if queryset.status == 'rented':
+                return Response({"error": "Car is rented"}, status=status.HTTP_409_CONFLICT)
+            os = order_serializer()
+            cs = car_serializer()
+            print("creating")
+            os.create(request.data)
+            print("updating")
+            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'rented'})
+            return Response(status=status.HTTP_201_CREATED)
 
     except KeyError:
             return JsonResponse({'error': KeyError})
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def return_car(request):
+    id = jwt.decode(request.data['token'], "adrian")
+    carid = request.data['idCar']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Car.objects.get(idcar=carid)
+            print('Q: ', queryset)
+            if queryset.status == 'free':
+                return Response({"error": "Car is free"}, status=status.HTTP_409_CONFLICT)
+
+            cs = car_serializer()
+            print("updating")
+            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'free'})
+            return Response(status=status.HTTP_201_CREATED)
+
+    except KeyError:
+            return JsonResponse({'error': KeyError})
 
 @api_view(["POST"])
 def car_delete_view(request, id):
@@ -214,6 +243,9 @@ def get_customer_orders(request):
             return JsonResponse({"error": "authentication error"}, status = status.HTTP_401_UNAUTHORIZED)
     except KeyError:
         return JsonResponse({'error': KeyError})
+
+
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def order_view(request):

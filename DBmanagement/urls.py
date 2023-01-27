@@ -19,5 +19,6 @@ urlpatterns = [
     path('countorders/', views.orders_count),
     path('generatedashboard/', views.dashborad_view),
     path('clientupdate/', views.client_update_view),
-    path('customerorders/', views.get_customer_orders)
+    path('customerorders/', views.get_customer_orders),
+    path('rentcar/', views.rent_car)
 ]
