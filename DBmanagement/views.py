@@ -23,7 +23,10 @@ def login_view(request):
                 'idStaff': user['idstaff'],
             }
             token = jwt.encode(payload,"adrian")
-            return JsonResponse({'token': token.decode('utf-8')})
+            return JsonResponse({
+                'token': token.decode('utf-8'),
+                'iduser': user['idstaff']
+            })
         else:
             return JsonResponse({'error': "did not found match"}, status.HTTP_401_UNAUTHORIZED)
     except KeyError:
@@ -77,7 +80,10 @@ def client_update_view(request):
             queryset = Client.objects.get(idclient = userid)
             print('Q: ', queryset)
             cs = client_serializer()
+            print('error ?')
             data = client_serializer.update(self=cs,instance=queryset, validated_data=request.data)
+            print('error ??')
+            return Response(status=status.HTTP_200_OK)
     except KeyError:
         return JsonResponse({'error': KeyError})
 
@@ -164,6 +170,21 @@ def car_update_view(request):
     except KeyError:
         return JsonResponse({'error': KeyError})
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def rent_car(request):
+    id = jwt.decode(request.data['token'], "adrian")
+
+    carid = request.data['idCar']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Car.objects.get(idCar=carid)
+            print('Q: ', queryset)
+            
+
+    except KeyError:
+            return JsonResponse({'error': KeyError})
 
 
 @api_view(["POST"])
@@ -175,8 +196,26 @@ def car_delete_view(request, id):
         return HttpResponseRedirect("/")
     return render(request, "deletecar_view.html", context)
 
-
 @api_view(["GET"])
+@permission_classes([AllowAny])
+def get_customer_orders(request):
+    id = jwt.decode(request.data['token'], "adrian")
+
+    userid = request.data['idUser']
+    print(id)
+    print(userid)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Order.objects.get(idclient=userid)
+            print('Q: ', queryset)
+            data = serializers.serialize('json', [queryset])
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "authentication error"}, status = status.HTTP_401_UNAUTHORIZED)
+    except KeyError:
+        return JsonResponse({'error': KeyError})
+@api_view(["GET"])
+@permission_classes([AllowAny])
 def order_view(request):
     id = jwt.decode(request.data['token'], "adrian")
     print(id)
@@ -228,6 +267,7 @@ def orders_count(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def staff_view(request):
     id = jwt.decode(request.data['token'], "adrian")
     print(id)
