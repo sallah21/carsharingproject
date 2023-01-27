@@ -4,9 +4,13 @@ import random
 import shortuuid
 from rest_framework.serializers import ModelSerializer
 from rest_framework import exceptions, serializers
-from DBmanagement.models import Client, Car, Order
+from DBmanagement.models import Client, Car, Order, Listofcars
 
-
+class listofcar_serializer(ModelSerializer):
+    def create(self, validated_data):
+        instance = Listofcars()
+        instance.idorder = validated_data.get('idOrder')
+        instance.idcar= validated_data.get('idCar')
 class order_serializer(ModelSerializer):
     def create(self, validated_data):
         instance = Order()

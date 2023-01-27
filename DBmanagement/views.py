@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .forms import *
-from DBmanagement.serializers import client_serializer, car_serializer, order_serializer
+from DBmanagement.serializers import client_serializer, car_serializer, order_serializer, listofcar_serializer
 
 
 @api_view(["POST"])
@@ -186,8 +186,13 @@ def rent_car(request):
                 return Response({"error": "Car is rented"}, status=status.HTTP_409_CONFLICT)
             os = order_serializer()
             cs = car_serializer()
+            loc = listofcar_serializer()
             print("creating")
-            os.create(request.data)
+            data = os.create(request.data)
+            loc.create(validated_data={
+                'idCar': carid,
+                'idOrder': data.idorder
+            })
             print("updating")
             car_serializer.update(cs, instance=queryset, validated_data={'Status': 'rented'})
             return Response(status=status.HTTP_201_CREATED)
@@ -256,20 +261,30 @@ def send_feedback(request):
 def get_customer_orders(request):
     id = jwt.decode(request.data['token'], "adrian")
 
-    userid = request.data['idUser']
+    userid = request.data['idClient']
     print(id)
     print(userid)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
-            queryset = Order.objects.get(idclient=userid)
+            queryset = Order.objects.all().filter(idclient=userid)
             print('Q: ', queryset)
-            data = serializers.serialize('json', [queryset])
+            data = serializers.serialize('json', queryset)
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({"error": "authentication error"}, status = status.HTTP_401_UNAUTHORIZED)
     except KeyError:
         return JsonResponse({'error': KeyError})
+    idclient = request.data['idClient']
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Order.objects.get(idclient=idclient)
+            print('Q: ', queryset)
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "authentication error"})
 
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 
 @api_view(["GET"])
@@ -286,7 +301,43 @@ def order_view(request):
             return JsonResponse({"error": "authentication error" })
     except KeyError:
         return JsonResponse({'error': "database error"} )
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_user_rented_cars(request):
+    id = jwt.decode(request.data['token'], "adrian")
+    idclient = request.data['idClient']
+    print(id)
+    res = []
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Order.objects.all().filter(idclient = idclient)
+            for o in queryset:
+                print(o.idorder)
+                listcars = Listofcars.objects.get(idorder = o.idorder)
+                res.append(listcars.idcar)
 
+            data = serializers.serialize('json', res)
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "authentication error"})
+    except KeyError:
+        return JsonResponse({'error': "database error"})
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def user_orders(request):
+    id = jwt.decode(request.data['token'], "adrian")
+    print(id)
+    try:
+        if Staff.objects.get(idStaff=id['idStaff']):
+            queryset = Order.objects.all()
+            data = serializers.serialize('json', queryset)
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({"error": "authentication error" })
+    except KeyError:
+        return JsonResponse({'error': "database error"} )
 
 @api_view(["POST"])
 def new_order_view(request):

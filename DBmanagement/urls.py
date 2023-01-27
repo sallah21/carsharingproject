@@ -12,6 +12,7 @@ urlpatterns = [
     path('users/', views.users_view),
     path('neworder/', views.new_order_view),
     path('orders/', views.order_view),
+    path('customerorders/', views.get_customer_orders),
     path('orders/<id>/delete', views.order_delete_view),
     path('servicestypes/', views.service_list_view),
     path('login/', views.login_view),
@@ -23,5 +24,5 @@ urlpatterns = [
     path('rentcar/', views.rent_car),
     path('returncar/', views.return_car),
     path('sendfeedback/', views.send_feedback),
-
+    path('getuserrented/', views.get_user_rented_cars),
 ]
