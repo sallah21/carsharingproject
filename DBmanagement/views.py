@@ -339,12 +339,18 @@ def get_user_rented_cars(request):
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
             queryset = Order.objects.all().filter(idclient = idclient)
+            print(len(queryset))
             for o in queryset:
                 print(o.idorder)
+
                 listcars = Listofcars.objects.get(idorder = o.idorder)
+
+                print(listcars)
                 res.append(listcars.idcar)
 
+            print("error2")
             data = serializers.serialize('json', res)
+            print("error")
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({"error": "authentication error"})
@@ -410,7 +416,7 @@ def staff_view(request):
     id = jwt.decode(request.data['token'], "adrian")
     print(id)
     try:
-        if Staff.objects.get(idStaff= id["idStaff"]):
+        if Staff.objects.get(idstaff= id["idStaff"]):
             queryset = Staff.objects.all()
             data = serializers.serialize('json', queryset)
             return JsonResponse(data, safe=False)
