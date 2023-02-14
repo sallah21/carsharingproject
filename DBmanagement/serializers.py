@@ -71,7 +71,8 @@ class client_serializer(ModelSerializer):
 
 class car_serializer(ModelSerializer):
     def create(self, validated_data):
-        instance =  Car()
+        instance = Car()
+        instance.idcar = instance.idorder= random.randint(1000, 9999)
         instance.model = validated_data.get('Model', instance.model)
         instance.enginetype = validated_data.get('EngineType', instance.enginetype)
         instance.enginecapacity = validated_data.get('EngineCapacity', instance.enginecapacity)

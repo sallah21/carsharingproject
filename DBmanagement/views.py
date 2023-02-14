@@ -74,8 +74,10 @@ def user_delete_view(request, id):
 @permission_classes([AllowAny])
 def client_update_view(request):
     id = jwt.decode(request.data['token'], "adrian")
-
-    userid = request.data['idClient']
+    try:
+        userid = request.data['idClient']
+    except KeyError:
+        return JsonResponse({'error': KeyError})
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
@@ -98,12 +100,13 @@ def services_view(request):
             data = serializers.serialize('json', queryset)
             return JsonResponse(data, safe=False)
         else:
-            return JsonResponse({"error": "authentication error" })
+            return JsonResponse({"error": KeyError})
     except KeyError:
         return JsonResponse({'error': "database error"} )
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def service_create_view(request):
     context = {}
     form = ServiceFrom(request.POST or None)
@@ -114,6 +117,7 @@ def service_create_view(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def service_list_view(request):
     queryset = Servicetype.objects.all()
     data = serializers.serialize('json', queryset)
@@ -122,6 +126,7 @@ def service_list_view(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def service_delete_view(request, id):
     context = {}
     obj = get_object_or_404(Service, idservice=id)
@@ -133,8 +138,9 @@ def service_delete_view(request, id):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def cars_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
+
     try:
+        id = jwt.decode(request.data['token'], "adrian")
         if Staff.objects.get(idstaff=id['idStaff']):
             queryset = Car.objects.all()
             data = serializers.serialize('json', queryset)
@@ -146,13 +152,33 @@ def cars_view(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def car_create_view(request):
-    context = {}
-    form = NewCarFrom(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context["form"] = form
-    return render(request, "createcar_view.html", context)
+    id = jwt.decode(request.data['token'], "adrian")
+
+    carid = request.data['idCar']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Car.objects.get(idcar=carid)
+            print('Q: ', queryset)
+
+
+            cs = car_serializer()
+            loc = listofcar_serializer()
+            os = order_serializer()
+            print("creating")
+            data = os.create(request.data)
+            loc.create(validated_data={
+                'idCar': carid,
+                'idOrder': data.idorder
+            })
+            print("updating")
+            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'rented'})
+            return Response(status=status.HTTP_201_CREATED)
+
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -198,7 +224,8 @@ def rent_car(request):
             return Response(status=status.HTTP_201_CREATED)
 
     except KeyError:
-            return JsonResponse({'error': KeyError})
+        return JsonResponse({'error': KeyError})
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -222,6 +249,7 @@ def return_car(request):
             return JsonResponse({'error': KeyError})
 
 @api_view(["DELETE"])
+@permission_classes([AllowAny])
 def car_delete_view(request, id):
     id = jwt.decode(request.data['token'], "adrian")
 
@@ -340,6 +368,7 @@ def user_orders(request):
         return JsonResponse({'error': "database error"} )
 
 @api_view(["POST"])
+
 def new_order_view(request):
     context = {}
     form = NewOrderForm(request.POST or None)
@@ -395,7 +424,7 @@ def staff_view(request):
 @permission_classes([AllowAny])
 def dashborad_view(request):
     id = jwt.decode(request.data['token'], "adrian")
-    userid = 1
+    userid = id['userid']
     print(id)
     try:
         if Staff.objects.get(idstaff= id['idStaff']):
