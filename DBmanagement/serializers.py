@@ -4,13 +4,17 @@ import random
 import shortuuid
 from rest_framework.serializers import ModelSerializer
 from rest_framework import exceptions, serializers
-from DBmanagement.models import Client, Car, Order, Listofcars
+from DBmanagement.models import Client, Car, Order, Listofcars, Service
+
 
 class listofcar_serializer(ModelSerializer):
     def create(self, validated_data):
         instance = Listofcars()
+        instance.idlistofcars = random.randint(1000, 9999)
         instance.idorder = validated_data.get('idOrder')
         instance.idcar= validated_data.get('idCar')
+        instance.save()
+        return  instance
 class order_serializer(ModelSerializer):
     def create(self, validated_data):
         instance = Order()
@@ -59,10 +63,9 @@ class client_serializer(ModelSerializer):
         print(self.context)
         #instance.name = self.context['Name']
         instance.name = validated_data.get('Name', instance.name)
-        instance.surname = validated_data.get('Surmame', instance.surname)
+        instance.surname = validated_data.get('Surname', instance.surname)
         instance.phonenumber = validated_data.get('PhoneNumber', instance.phonenumber)
         instance.pesel = validated_data.get('Pesel', instance.pesel)
-
         instance.save()
         return instance
     class Meta:
@@ -72,25 +75,47 @@ class client_serializer(ModelSerializer):
 class car_serializer(ModelSerializer):
     def create(self, validated_data):
         instance = Car()
-        instance.idcar = instance.idorder= random.randint(1000, 9999)
-        instance.model = validated_data.get('Model', instance.model)
-        instance.enginetype = validated_data.get('EngineType', instance.enginetype)
-        instance.enginecapacity = validated_data.get('EngineCapacity', instance.enginecapacity)
-        instance.status = validated_data.get('Status', instance.status)
-        instance.numberofseats = validated_data.get('NumberOfSeats', instance.numberofseats)
-        instance.value = validated_data.get('Value', instance.value)
+        instance.idcar =  random.randint(1000, 9999)
+        instance.model = validated_data.get('model', instance.model)
+        instance.enginetype = validated_data.get('enginetype', instance.enginetype)
+        instance.enginecapacity = validated_data.get('enginecapacity', instance.enginecapacity)
+        instance.status = validated_data.get('status', instance.status)
+        instance.numberofseats = validated_data.get('numberofseats', instance.numberofseats)
+        instance.value = validated_data.get('value', instance.value)
         instance.save()
         return instance
     def update(self, instance, validated_data):
-        instance.model = validated_data.get('Model', instance.model)
-        instance.enginetype = validated_data.get('EngineType', instance.enginetype)
-        instance.enginecapacity = validated_data.get('EngineCapacity', instance.enginecapacity)
-        instance.status = validated_data.get('Status', instance.status)
-        instance.numberofseats = validated_data.get('NumberOfSeats', instance.numberofseats)
-        instance.value = validated_data.get('Value', instance.value)
+        instance.model = validated_data.get('model', instance.model)
+        instance.enginetype = validated_data.get('enginetype', instance.enginetype)
+        instance.enginecapacity = validated_data.get('enginecapacity', instance.enginecapacity)
+        instance.status = validated_data.get('status', instance.status)
+        instance.numberofseats = validated_data.get('numberofseats', instance.numberofseats)
+        instance.value = validated_data.get('value', instance.value)
         instance.save()
         return instance
 
     class Meta:
         model = Car
         fields = "__all__"
+
+class service_serializer(ModelSerializer):
+        def create(self, validated_data):
+            instance = Service()
+            instance.idservice = random.randint(1000, 9999)
+            instance.dateservicestart = datetime.date.today()
+            instance.dateserviceend = None
+            instance.price = None
+            instance.idcar =Car.objects.get(idcar=validated_data.get('idcar', instance.idcar))
+            instance.save()
+            return instance
+        def update(self, instance,validated_data):
+
+            instance.dateservicestart = validated_data.get('dateservicestart', instance.dateservicestart)
+            instance.dateserviceend = validated_data.get('dateserviceend', instance.dateserviceend)
+            instance.price = validated_data.get('price', instance.price)
+            instance.idcar = validated_data.get('idcar', instance.idcar)
+            instance.save()
+            return instance
+        class Meta:
+            model = Service
+            fields = "__all__"

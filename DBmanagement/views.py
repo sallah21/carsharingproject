@@ -9,7 +9,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .forms import *
-from DBmanagement.serializers import client_serializer, car_serializer, order_serializer, listofcar_serializer
+from DBmanagement.serializers import client_serializer, car_serializer, order_serializer, listofcar_serializer, \
+    service_serializer
 
 
 @api_view(["POST"])
@@ -38,8 +39,10 @@ def login_view(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def users_view(request):
-    id =jwt.decode( request.data['token'], "adrian")
-    print(id)
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
             queryset = Client.objects.all()
@@ -73,7 +76,10 @@ def user_delete_view(request, id):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def client_update_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     try:
         userid = request.data['idClient']
     except KeyError:
@@ -92,7 +98,10 @@ def client_update_view(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def services_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
@@ -108,13 +117,41 @@ def services_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def service_create_view(request):
-    context = {}
-    form = ServiceFrom(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context["form"] = form
-    return render(request, "createService_view.html", context)
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            ss = service_serializer()
+            print("creating")
+            data = ss.create(request.data)
+            return Response(status=status.HTTP_201_CREATED)
 
+    except KeyError:
+        return JsonResponse({'error': KeyError})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def service_update_view(request):
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
+    serviceid = request.data['idService']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Service.objects.get(idservice=serviceid)
+            print('Q: ', queryset)
+            ss = service_serializer()
+            data = service_serializer.update(self=ss, instance=queryset, validated_data=request.data)
+            print("updated")
+            return Response(status=status.HTTP_200_OK)
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -127,13 +164,24 @@ def service_list_view(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
-def service_delete_view(request, id):
-    context = {}
-    obj = get_object_or_404(Service, idservice=id)
-    if request.method == "POST":
-        obj.delete()
-        return HttpResponseRedirect("/")
-    return render(request, "deleteservice_view.html", context)
+def service_delete_view(request):
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
+
+    idservice = request.data['idService']
+    print(id)
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Service.objects.get(idservice=idservice)
+            print('Q: ', queryset)
+            print("updating")
+            queryset.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    except KeyError:
+        return JsonResponse({'error': KeyError})
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -154,27 +202,16 @@ def cars_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def car_create_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
-
-    carid = request.data['idCar']
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
-            queryset = Car.objects.get(idcar=carid)
-            print('Q: ', queryset)
-
-
             cs = car_serializer()
-            loc = listofcar_serializer()
-            os = order_serializer()
             print("creating")
-            data = os.create(request.data)
-            loc.create(validated_data={
-                'idCar': carid,
-                'idOrder': data.idorder
-            })
-            print("updating")
-            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'rented'})
+            data = cs.create(request.data)
             return Response(status=status.HTTP_201_CREATED)
 
     except KeyError:
@@ -183,8 +220,10 @@ def car_create_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def car_update_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
-
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     carid = request.data['idCar']
     print(id)
     try:
@@ -199,7 +238,10 @@ def car_update_view(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def rent_car(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
 
     carid = request.data['idCar']
     print(id)
@@ -213,14 +255,15 @@ def rent_car(request):
             os = order_serializer()
             cs = car_serializer()
             loc = listofcar_serializer()
+            car_serializer.update(cs, instance=Car.objects.get(idcar=carid), validated_data={'status': 'rented'})
             print("creating")
             data = os.create(request.data)
             loc.create(validated_data={
-                'idCar': carid,
-                'idOrder': data.idorder
+                'idCar': Car.objects.get(idcar = carid),
+                'idOrder':  Order.objects.get(idorder = data.idorder)#
             })
             print("updating")
-            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'rented'})
+
             return Response(status=status.HTTP_201_CREATED)
 
     except KeyError:
@@ -230,7 +273,10 @@ def rent_car(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def return_car(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     carid = request.data['idCar']
     print(id)
     try:
@@ -239,10 +285,9 @@ def return_car(request):
             print('Q: ', queryset)
             if queryset.status == 'free':
                 return Response({"error": "Car is free"}, status=status.HTTP_409_CONFLICT)
-
             cs = car_serializer()
             print("updating")
-            car_serializer.update(cs, instance=queryset, validated_data={'Status': 'free'})
+            car_serializer.update(cs, instance=queryset, validated_data={'status': 'free'})
             return Response(status=status.HTTP_201_CREATED)
 
     except KeyError:
@@ -250,8 +295,11 @@ def return_car(request):
 
 @api_view(["DELETE"])
 @permission_classes([AllowAny])
-def car_delete_view(request, id):
-    id = jwt.decode(request.data['token'], "adrian")
+def car_delete_view(request):
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
 
     idcar = request.data['idCar']
     print(id)
@@ -269,7 +317,10 @@ def car_delete_view(request, id):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def send_feedback(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     feedback = request.data['Feedback']
     idorder = request.data['idOrder']
     print(id)
@@ -287,7 +338,10 @@ def send_feedback(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_customer_orders(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
 
     userid = request.data['idClient']
     print(id)
@@ -318,10 +372,13 @@ def get_customer_orders(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def order_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
     try:
-        if Staff.objects.get(idStaff=id['idStaff']):
+        if Staff.objects.get(idstaff=id['idStaff']):
             queryset = Order.objects.all()
             data = serializers.serialize('json', queryset)
             return JsonResponse(data, safe=False)
@@ -332,7 +389,10 @@ def order_view(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_user_rented_cars(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     idclient = request.data['idClient']
     print(id)
     res = []
@@ -342,9 +402,7 @@ def get_user_rented_cars(request):
             print(len(queryset))
             for o in queryset:
                 print(o.idorder)
-
                 listcars = Listofcars.objects.get(idorder = o.idorder)
-
                 print(listcars)
                 res.append(listcars.idcar)
 
@@ -356,16 +414,36 @@ def get_user_rented_cars(request):
             return JsonResponse({"error": "authentication error"})
     except KeyError:
         return JsonResponse({'error': "database error"})
-
-
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def user_orders_count(request):
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
+    print(id)
+    userid = request.data['idClient']
+    try:
+        if Staff.objects.get(idstaff=id['idStaff']):
+            queryset = Order.objects.all().filter(idclient = userid).count()
+            print(queryset)
+            return JsonResponse({"userid": userid,"user orders":queryset}, safe=False)
+        else:
+            return JsonResponse({"error": "authentication error"})
+    except KeyError:
+        return JsonResponse({'error': "database error"})
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def user_orders(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
+    userid = request.data['idClient']
     try:
         if Staff.objects.get(idStaff=id['idStaff']):
-            queryset = Order.objects.all()
+            queryset = Order.objects.all().filter(idclient = userid )
             data = serializers.serialize('json', queryset)
             return JsonResponse(data, safe=False)
         else:
@@ -397,7 +475,10 @@ def order_delete_view(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def orders_count(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
     try:
         if Staff.objects.get(idstaff=id['idStaff']):
@@ -413,7 +494,10 @@ def orders_count(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def staff_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
     print(id)
     try:
         if Staff.objects.get(idstaff= id["idStaff"]):
@@ -429,8 +513,11 @@ def staff_view(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def dashborad_view(request):
-    id = jwt.decode(request.data['token'], "adrian")
-    userid = id['userid']
+    try:
+        id = jwt.decode(request.data['token'], "adrian")
+    except KeyError:
+        return JsonResponse({'error': "Token error"})
+    userid = 1
     print(id)
     try:
         if Staff.objects.get(idstaff= id['idStaff']):
@@ -439,7 +526,16 @@ def dashborad_view(request):
             try:
                 for o in Order.objects.filter(idclient=userid):
                     p = Payment.objects.filter(idorder=o.idorder).first()
-                    payment = payment + p.amounttopay - p.amountpayed
+                    if p is not None:
+
+                        if p.amountpayed is None:
+                            continue
+                        else:
+                            payment = payment - p.amountpayed
+                        if p.amounttopay is None:
+                            continue
+                        else:
+                            payment = payment + p.amounttopay
 
             except KeyError:
                 print("error", KeyError)
